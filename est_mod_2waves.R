@@ -1,4 +1,4 @@
-## @knitr slurm_stuff1
+## @knitr slurm_stuff2
 model_obj_dir <- 'model_obj'
 model_text_dir <- 'model_text'
 if(!dir.exists(model_obj_dir)){
@@ -10,20 +10,18 @@ if(!dir.exists(model_text_dir)){
     dir.create(model_text_dir)
 }
 if(Sys.getenv('HOME') != '/users/jflournoy'){
-    task_id <- 1
     cpus_per_task <- 4
     message('Not running on SLURM system')
     warmup <- 200
     iter <- 500
 } else {
-    task_id <- as.numeric(Sys.getenv('SLURM_ARRAY_TASK_ID'))
     cpus_per_task <- as.numeric(Sys.getenv('SLURM_CPUS_PER_TASK'))
     warmup <- 2000
     iter <- 7500
     message('Running on SLURM system')
 }
 
-seed <- 319 + task_id #random.org
+seed <- 319 #random.org
 
 ## @knitr est_mod_2waves
 library(brms)

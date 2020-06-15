@@ -1,0 +1,32 @@
+---
+title: "Correlated Slope Model Test"
+author: "John Flournoy"
+date: "6/13/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::read_chunk('simulate.R')
+knitr::read_chunk('est_mod_full_data.R')
+knitr::read_chunk('est_mod_2waves.R')
+```
+
+```{r simulate_data, message = F, warning = F, results = 'hide'}
+```
+
+```{r}
+library(lme4)
+
+m1 <- lmer(y1 ~ 1 + age_c + (1 + age_c | id), data = d)
+summary(m1)
+
+m2 <- lmer(y2 ~ 1 + age_c + (1 + age_c | id), data = d)
+summary(m2)
+```
+
+```{r est_mod_full_data, eval = FALSE}
+```
+
+```{r est_mod_2waves, eval = FALSE}
+```
