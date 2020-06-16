@@ -55,6 +55,14 @@ d2wave <- do(group_by(d, id),
 # ggplot(d2wave, aes(x = age, y = id_fac, group = id))+
 #     geom_line(alpha = .5) +
 #     geom_point(size = .25)
+# ggplot(d2wave, aes(x = age, y = y1, group = id))+
+#     # geom_line(stat = 'smooth', method = 'lm', alpha = .25) +
+#     geom_line(alpha = .25) +
+#     geom_point(size = .25)
+# ggplot(d2wave, aes(x = age, y = y2, group = id))+
+#     # geom_line(stat = 'smooth', method = 'lm', alpha = .25) +
+#     geom_line(alpha = .25) +
+#     geom_point(size = .25)
 
 priors <- c(set_prior('normal(0,2.5)', class = 'b', resp = 'y1', coef = 'age_c'),
             set_prior('normal(0,2.5)', class = 'b', resp = 'y2', coef = 'age_c'),

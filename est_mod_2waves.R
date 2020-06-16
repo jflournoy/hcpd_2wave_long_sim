@@ -29,16 +29,21 @@ library(dplyr)
 d <- readRDS('sim_data.rds')
 fname <- 'fit_2waves'
 
-d2wave <- do(group_by(d, id), 
-             {
-                 i <- sample(1:dim(.)[1], size = 1)
-                 if( (i + 10) > dim(.)[1]){
-                     i2 <- i - 10
-                 } else {
-                     i2 <- i + 10
-                 }
-                 .[c(i, i2), ]
-             })
+if(!file.exists('d2wave.rds')){
+    d2wave <- do(group_by(d, id), 
+                 {
+                     i <- sample(1:dim(.)[1], size = 1)
+                     if( (i + 10) > dim(.)[1]){
+                         i2 <- i - 10
+                     } else {
+                         i2 <- i + 10
+                     }
+                     .[c(i, i2), ]
+                 })
+    saveRDS(d2wave, 'd2wave.rds')
+} else {
+    d2wave <- readRDS('d2wave.rds')
+}
 
 # library(ggplot2)
 # d2wave_id <- do(group_by(d2wave, id),
@@ -48,6 +53,14 @@ d2wave <- do(group_by(d, id),
 # d2wave$id_fac <- factor(d2wave$id, levels = d2wave_id$id[order(d2wave_id$age)])
 # ggplot(d2wave, aes(x = age, y = id_fac, group = id))+
 #     geom_line(alpha = .5) +
+#     geom_point(size = .25)
+# ggplot(d2wave, aes(x = age, y = y1, group = id))+
+#     # geom_line(stat = 'smooth', method = 'lm', alpha = .25) +
+#     geom_line(alpha = .25) +
+#     geom_point(size = .25)
+# ggplot(d2wave, aes(x = age, y = y2, group = id))+
+#     # geom_line(stat = 'smooth', method = 'lm', alpha = .25) +
+#     geom_line(alpha = .25) +
 #     geom_point(size = .25)
 
 priors <- c(set_prior('normal(0,2.5)', class = 'b', resp = 'y1', coef = 'age_c'),

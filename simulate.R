@@ -105,6 +105,15 @@ if(!file.exists('sim_data.rds')){
     #     geom_line(alpha = .25) +
     #     geom_point(size = .25)
     
+    loadings <- runif(6, .7, .85)
+    #Create 3 indicators for y1 and y2
+    d$y1_a <- loadings[[1]] * d$y1 + rnorm(dim(d)[1])
+    d$y1_b <- loadings[[2]] * d$y1 + rnorm(dim(d)[1])
+    d$y1_c <- loadings[[3]] * d$y1 + rnorm(dim(d)[1])
+    d$y2_a <- loadings[[4]] * d$y2 + rnorm(dim(d)[1])
+    d$y2_b <- loadings[[5]] * d$y2 + rnorm(dim(d)[1])
+    d$y2_c <- loadings[[6]] * d$y2 + rnorm(dim(d)[1])
+    
     saveRDS(d, file = 'sim_data.rds')
 } else {
     d <- readRDS('sim_data.rds')
