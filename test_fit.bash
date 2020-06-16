@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH -J hcpd-test
+#SBATCH --account somerville_lab
 #SBATCH --mem 5G
 #SBATCH -p ncf
 #SBATCH --cpus-per-task 4
@@ -18,5 +19,7 @@ cp ~/.R/Makevars.gcc ~/.R/Makevars
 export R_LIBS_USER=/ncf/mclaughlin/users/jflournoy/R_3.5.1_GCC:$R_LIBS_USER
 
 runme="${1}"
+
+echo "Running Rscript ${runme}..."
 
 srun -c 4 `which Rscript` "${runme}"

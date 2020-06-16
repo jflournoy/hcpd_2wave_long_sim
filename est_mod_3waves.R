@@ -1,4 +1,4 @@
-## @knitr slurm_stuff2
+## @knitr slurm_stuff3
 model_obj_dir <- 'model_obj'
 model_text_dir <- 'model_text'
 if(!dir.exists(model_obj_dir)){
@@ -21,23 +21,29 @@ if(Sys.getenv('HOME') != '/users/jflournoy'){
     message('Running on SLURM system')
 }
 
-seed <- 319 #random.org
+seed <- 648 #random.org
 
-## @knitr est_mod_2waves
+## @knitr est_mod_3waves
 library(brms)
 library(dplyr)
 d <- readRDS('sim_data.rds')
-fname <- 'fit_2waves'
+fname <- 'fit_3waves'
 
 d2wave <- do(group_by(d, id), 
              {
                  i <- sample(1:dim(.)[1], size = 1)
-                 if( (i + 10) > dim(.)[1]){
+                 if( (i + 10) > dim(.)[1] ){
                      i2 <- i - 10
+		     i3 <- i - 20
                  } else {
+		     if( (i + 20) > dim(.)[1] ) {
+		         i3 <- i - 10
+                     } else {
+	                 i3 <- i + 20
+                     }		     
                      i2 <- i + 10
                  }
-                 .[c(i, i2), ]
+                 .[c(i, i2, i3), ]
              })
 
 # library(ggplot2)
