@@ -11,6 +11,7 @@ knitr::read_chunk('simulate.R')
 knitr::read_chunk('est_mod_full_data.R')
 knitr::read_chunk('est_mod_2waves.R')
 knitr::read_chunk('est_mod_2waves_reduced_model.R')
+knitr::read_chunk('est_mod_ld_2waves.R')
 ```
 
 ```{r simulate_data, message = F, warning = F, results = 'hide'}
@@ -101,4 +102,7 @@ d2wave %>%
     summarize(y1_diff = diff(y1), y2_diff = diff(y2)) %>%
     ungroup() %>%
     summarize(r = cor(y1_diff, y2_diff))
+```
+
+```{r latent_differences_2wave, eval = TRUE}
 ```
