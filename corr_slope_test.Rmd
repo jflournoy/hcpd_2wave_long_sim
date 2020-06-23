@@ -1,9 +1,19 @@
 ---
 title: "Correlated Slope Model Test"
 author: "John Flournoy"
-date: "6/13/2020"
-output: html_document
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
 ---
+
+Here I simulate data from two linear growth models with moderately correlated individual differences in slope (r = .3). A single data set is simulated and then sampled from so that each individual is observed at two roughly equally spaced intervals across a wide range of ages. We then look at parameter recovery across a few different types of models. This is just a very simple feasibility case study, not a full simulation study. 
+
+It appears that fitting a latent difference score model is feasible but may overestimate the correlated differences. It also appears that fitting two bayesian hierarchical linear growth and then computing the correlations of the slopes may work. A very reduced multivariate Bayesian growth model may be feasible but may overestimate the correlation (we could look at the choice of the prior). Fitting a full multivariate Bayesian growth model is not feasible. 
+
+Correlating the random effects from two maximim-likelihood multi-level models is feasible but likely over-estiamtes the correlation of slopes. Correlating computed differences also seems likely to overestimate the correlation.
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -14,29 +24,25 @@ knitr::read_chunk('est_mod_2waves_reduced_model.R')
 knitr::read_chunk('est_mod_ld_2waves.R')
 ```
 
+# Simulate data
+
 ```{r simulate_data, message = F, warning = F, results = 'hide'}
 ```
 
+# Multi-level models using the full data
+
+
 ```{r}
 library(lme4)
-library(reghelper)
-x <- rnorm(1000)
-y <- rep(rnorm(100, 0, 10), each = 10) + rep(rnorm(100, 0, 1), each = 10) * x + rnorm(1000)
-id <- rep(1:100, 10)
-
-summary(lmer(scale(y) ~ scale(x) + (1 | id)))
-reghelper::beta(lmer(y ~ x + (1 | id)))
-summary(lmer(scale(y) ~ x + (1 + x | id)))
-reghelper::beta(lmer(y ~ x + (1 + x | id)))
 
 m1 <- lmer(y1 ~ 1 + age_c + (1 + age_c | id), data = d)
 summary(m1)
-reghelper::beta(m1)
-
 
 m2 <- lmer(y2 ~ 1 + age_c + (1 + age_c | id), data = d)
 summary(m2)
 ```
+
+# Multi-level models using the 2 waves
 
 ```{r}
 seed <- 319 #random.org
@@ -62,11 +68,17 @@ summary(m2_2wave)
 cor(ranef(m1_2wave)$id[['age_c']], ranef(m2_2wave)$id[['age_c']])
 ```
 
+# Multivariate Bayesian model on the full data
+
 ```{r est_mod_full_data, eval = FALSE}
 ```
 
+# Multivariate Bayesian model on the two waves of data
+
 ```{r est_mod_2waves, eval = FALSE}
 ```
+
+# Reduced multivariate Bayesian model on the full data
 
 ```{r slurm_stuff4, eval = TRUE, echo = FALSE}
 ```
@@ -103,6 +115,8 @@ d2wave %>%
     ungroup() %>%
     summarize(r = cor(y1_diff, y2_diff))
 ```
+
+# Latent difference score model on 2 waves
 
 ```{r latent_differences_2wave, eval = TRUE}
 ```

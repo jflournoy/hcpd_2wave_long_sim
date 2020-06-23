@@ -2,7 +2,6 @@
 
 seed <- 319 #random.org
 
-## @knitr est_mod_2waves
 library(lavaan)
 library(dplyr)
 library(tidyr)
@@ -134,20 +133,22 @@ y1_w1 ~~ y2_w1
 delta_y1 ~~ delta_y2
 '
 
+ld_df <- as.data.frame(select(d2wave_w, -y1_w1, -y1_w2, -y2_w1, -y2_w2))
+
 measurement_only <- paste(c(measurement_model, measurement_only_extras), collapse = '\n')
-fitMeasurement <- lavaan(measurement_only, data = as.data.frame(d2wave_w), 
+fitMeasurement <- lavaan(measurement_only, data = ld_df, 
                          estimator = 'mlr', missing = 'fiml',
                          fixed.x = FALSE)
 
 LCS <- paste(c(measurement_model, ld_model), collapse = '\n')
 
-fitLCS <- lavaan(LCS, data = as.data.frame(d2wave_w), 
+fitLCS <- lavaan(LCS, data = ld_df, 
                  estimator = 'mlr', missing = 'fiml',
                  fixed.x = FALSE)
 summary(fitLCS, stan = TRUE)
 
 
-fitLCS75 <- lavaan(LCS, data = as.data.frame(d2wave_w)[sample(1:dim(d2wave_w)[1], size = 75), ], 
+fitLCS75 <- lavaan(LCS, data = ld_df[sample(1:dim(ld_df)[1], size = 75), ], 
                  estimator = 'mlr', missing = 'fiml',
                  fixed.x = FALSE)
 summary(fitLCS75, stan = TRUE)
