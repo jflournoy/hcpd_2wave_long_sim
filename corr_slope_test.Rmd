@@ -18,9 +18,20 @@ knitr::read_chunk('est_mod_2waves_reduced_model.R')
 
 ```{r}
 library(lme4)
+library(reghelper)
+x <- rnorm(1000)
+y <- rep(rnorm(100, 0, 10), each = 10) + rep(rnorm(100, 0, 1), each = 10) * x + rnorm(1000)
+id <- rep(1:100, 10)
+
+summary(lmer(scale(y) ~ scale(x) + (1 | id)))
+reghelper::beta(lmer(y ~ x + (1 | id)))
+summary(lmer(scale(y) ~ x + (1 + x | id)))
+reghelper::beta(lmer(y ~ x + (1 + x | id)))
 
 m1 <- lmer(y1 ~ 1 + age_c + (1 + age_c | id), data = d)
 summary(m1)
+reghelper::beta(m1)
+
 
 m2 <- lmer(y2 ~ 1 + age_c + (1 + age_c | id), data = d)
 summary(m2)
