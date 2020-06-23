@@ -10,6 +10,7 @@ knitr::opts_chunk$set(echo = TRUE)
 knitr::read_chunk('simulate.R')
 knitr::read_chunk('est_mod_full_data.R')
 knitr::read_chunk('est_mod_2waves.R')
+knitr::read_chunk('est_mod_2waves_reduced_model.R')
 ```
 
 ```{r simulate_data, message = F, warning = F, results = 'hide'}
@@ -25,8 +26,68 @@ m2 <- lmer(y2 ~ 1 + age_c + (1 + age_c | id), data = d)
 summary(m2)
 ```
 
+```{r}
+seed <- 319 #random.org
+library(dplyr)
+d <- readRDS('sim_data.rds')
+
+d2wave <- do(group_by(d, id), 
+             {
+                 i <- sample(1:dim(.)[1], size = 1)
+                 if( (i + 10) > dim(.)[1]){
+                     i2 <- i - 10
+                 } else {
+                     i2 <- i + 10
+                 }
+                 .[c(i, i2), ]
+             })
+m1_2wave <- lmer(y1 ~ 1 + age_c + (1 + age_c || id), data = d2wave)
+summary(m1_2wave)
+
+m2_2wave <- lmer(y2 ~ 1 + age_c + (1 + age_c || id), data = d2wave)
+summary(m2_2wave)
+
+cor(ranef(m1_2wave)$id[['age_c']], ranef(m2_2wave)$id[['age_c']])
+```
+
 ```{r est_mod_full_data, eval = FALSE}
 ```
 
 ```{r est_mod_2waves, eval = FALSE}
+```
+
+```{r slurm_stuff4, eval = TRUE, echo = FALSE}
+```
+
+```{r est_mod_2waves_reduced, eval = TRUE}
+```
+
+```{r}
+np_cp1 <- nuts_params(fit1)
+bayesplot::mcmc_nuts_energy(np_cp1)
+summary(fit1)
+# bayesplot::mcmc_pairs(fit1, pars = c('b_Intercept', 'b_age_c', 'sd_id__age_c'))
+
+age_c_fit1 <- filter(tidybayes::spread_draws(fit1, r_id[id, term]), term == 'age_c')
+
+np_cp2 <- nuts_params(fit2)
+bayesplot::mcmc_nuts_energy(np_cp2)
+summary(fit2)
+
+age_c_fit2 <- filter(tidybayes::spread_draws(fit2, r_id[id, term]), term == 'age_c')
+
+age_c_re <- rename(select(ungroup(age_c_fit1), id, r_id, .chain, .iteration, .draw), fit1_age_c_id = r_id)
+age_c_re$fit2_age_c_id <- age_c_fit2$r_id
+
+age_c_re_sum <- summarize(group_by(age_c_re, .chain, .iteration, .draw),
+                          cor = cor(fit1_age_c_id, fit2_age_c_id))
+bayesplot::mcmc_areas(rename(age_c_re_sum[,c('.chain', 'cor')], Chain = .chain), prob = .95, prob_outer = .99)
+
+summary(fit)
+
+d2wave %>%
+    group_by(id) %>%
+    summarize(y1_diff = diff(y1), y2_diff = diff(y2)) %>%
+    ungroup() %>%
+    summarize(r = cor(y1_diff, y2_diff))
 ```
